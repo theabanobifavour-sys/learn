@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventure Library</title>
+<style>
+:root{--bg:#F4F5F1;--card:#fff;--fg:#15202B;--mut:#5B6773;--line:#D9DED6;--acc:#1E3FA8;--accbg:#E6ECFB;--ok:#1E7A4C;--warn:#8A5A00;--warnbg:#FFF1CF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151B;--card:#18202A;--fg:#E8EDF2;--mut:#9AA7B4;--line:#2A3541;--acc:#8FAEFF;--accbg:#1D2A4A;--ok:#6FD3A0;--warn:#F0C25A;--warnbg:#3A2F10}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:26px;margin:8px 0 4px}
+p.sub{color:var(--mut);margin:0 0 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+input[type=search]{flex:1 1 220px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:7px 12px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accbg);border-color:var(--acc);color:var(--acc);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 12px}
+.card h2{font-size:19px;margin:0 0 4px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.tag{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--accbg);color:var(--acc)}
+.tag.draft{background:var(--warnbg);color:var(--warn)}
+.card p{margin:0 0 8px}
+.topic{color:var(--mut);font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:#fff;font:inherit;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#10151B}}
+.btn.ghost{background:transparent;color:var(--acc)}
+.link{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--mut);word-break:break-all;margin-top:8px}
+.top{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.settings{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 12px}
+.settings summary{cursor:pointer;font-weight:600}
+.settings label{display:block;font-size:13.5px;color:var(--mut);margin:12px 0 4px}
+.settings input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:inherit}
+.note2{font-size:13.5px;color:var(--mut);margin:12px 0 2px}
+.empty{color:var(--mut);padding:24px 0;text-align:center}
+.note{font-size:13.5px;color:var(--mut);margin-top:22px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.lab{font-size:13px;color:var(--mut);margin:10px 0 6px;font-weight:600}
+.topic-h{font-size:20px;margin:22px 0 2px}
+.count{color:var(--mut);font-size:14px;margin:0 0 10px}
+ol.pl{list-style:none;margin:0;padding:0;counter-reset:g}
+ol.pl>li{counter-increment:g}
+ol.pl>li .card{position:relative;padding-left:52px}
+ol.pl>li .card::before{content:counter(g);position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--accbg);color:var(--acc);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Adventure Library</h1>
+  <p class="sub">Teacher page. Pick a class, a subject and a topic. Each topic is a playlist of Adventures in the order learners should play them.</p>
+
+  <div class="top">
+    <a class="btn ghost" id="consoleLink" href="console.html" target="_blank" rel="noopener">Open my results console</a>
+  </div>
+
+  <details class="settings"><summary>Link settings</summary>
+    <label for="gbase">Game address (only needed if the game and this page are at different web addresses). Use the folder address, ending in a slash.</label>
+    <input type="url" id="gbase" placeholder="For example https://yourname.github.io/learn/" aria-label="Game address">
+    <label for="gtag">Group tag, added to every copied link, so your Google Sheet shows which class or group each result came from</label>
+    <input type="text" id="gtag" maxlength="30" placeholder="For example JSS2A or Online-Oct" aria-label="Group tag">
+    <p class="note2">Test the results sheet: <a id="sheetLink" href="play.html#sheettest" target="_blank" rel="noopener">open the sheet check</a></p>
+  </details>
+
+  <div class="bar"><input type="search" id="q" placeholder="Search all classes by topic or idea" aria-label="Search the library"></div>
+  <div class="lab">Class</div>
+  <div class="chips" id="cls" role="group" aria-label="Choose a class"></div>
+  <div class="lab" id="subLab">Subject</div>
+  <div class="chips" id="sub" role="group" aria-label="Choose a subject"></div>
+  <div id="list" aria-live="polite"></div>
+
+  <p class="note">Learners should only ever be sent a game link or a playlist link, never this page. To add a game, ask Claude for it, then upload the new game file and the updated catalog.js to the games folder on GitHub.</p>
+</main>
+
+<script src="config.js"></script>
+<script src="catalog.js"></script>
+<script>
+var CATALOG = window.CATALOG || [];
+var $ = function(s){ return document.querySelector(s); };
+var state = {cls:'', sub:'', q:''};
+function store(k, v){ try { if (v === undefined) return localStorage.getItem(k) || ''; localStorage.setItem(k, v); } catch (e) {} return ''; }
+function base(){
+  var c = store('lib.base').trim().split('#')[0].split('?')[0];
+  if (c) { if (!/\/$/.test(c)) c = c.replace(/[^\/]*$/, ''); return c; }
+  try { return new URL('./', location.href).href; } catch (e) { return ''; }
+}
+function tag(){ return store('lib.tag').trim().replace(/[^A-Za-z0-9 _.-]/g, '').slice(0, 30); }
+function link(id, playlist){
+  var p = ['game=' + encodeURIComponent(id)]; if (playlist) p.push('next=1');
+  var t = tag(); if (t) p.push('g=' + encodeURIComponent(t));
+  return base() + 'play.html?' + p.join('&');
+}
+function refreshLinks(){
+  drawList();
+  var sl = $('#sheetLink'); if (sl) sl.href = base() + 'play.html#sheettest';
+  var cl = $('#consoleLink'); if (cl) cl.href = base() + 'console.html';
+}
+function copy(text, btn, label){
+  function done(ok){ btn.textContent = ok ? 'Copied' : 'Press and hold the link to copy'; setTimeout(function(){ btn.textContent = label; }, 1800); }
+  try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(false); }); return; } } catch (e) {}
+  try { var t = document.createElement('textarea'); t.value = text; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); var ok = document.execCommand('copy'); document.body.removeChild(t); done(ok); } catch (e) { done(false); }
+}
+function el(tg, attrs, kids){
+  var n = document.createElement(tg);
+  Object.keys(attrs || {}).forEach(function(k){ if (k === 'text') n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]); });
+  (kids || []).forEach(function(c){ n.appendChild(c); });
+  return n;
+}
+function uniq(a){ var r = []; a.forEach(function(x){ if (r.indexOf(x) < 0) r.push(x); }); return r; }
+var ORDER_CLS = ['Primary 4','Primary 5','Primary 6','JSS1','JSS2','JSS3','SS1','SS2','SS3'];
+function classes(){ var c = uniq(CATALOG.map(function(e){ return e.class; })); return c.sort(function(a, b){ var i = ORDER_CLS.indexOf(a), j = ORDER_CLS.indexOf(b); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j) || (a < b ? -1 : 1); }); }
+function subjectsOf(cls){ return uniq(CATALOG.filter(function(e){ return e.class === cls; }).map(function(e){ return e.subject; })); }
+function chips(host, items, cur, onPick){
+  host.replaceChildren();
+  items.forEach(function(s){
+    var b = el('button', {class:'chip', type:'button', 'aria-pressed': String(cur === s), text:s});
+    b.addEventListener('click', function(){ onPick(s); }); host.appendChild(b);
+  });
+}
+function drawNav(){
+  var cl = classes();
+  if (cl.indexOf(state.cls) < 0) state.cls = cl[0] || '';
+  var sb = subjectsOf(state.cls);
+  if (sb.indexOf(state.sub) < 0) state.sub = sb[0] || '';
+  chips($('#cls'), cl, state.cls, function(s){ state.cls = s; state.sub = ''; drawNav(); drawList(); });
+  chips($('#sub'), sb, state.sub, function(s){ state.sub = s; drawNav(); drawList(); });
+  var searching = !!state.q.trim();
+  $('#cls').style.display = $('#sub').style.display = searching ? 'none' : '';
+  $('#subLab').style.display = $('.lab').style.display = searching ? 'none' : '';
+}
+function gameCard(c, topicFirst){
+  var cp = el('button', {class:'btn', type:'button', text:'Copy link'});
+  cp.addEventListener('click', function(){ copy(link(c.id), cp, 'Copy link'); });
+  var open = el('a', {class:'btn ghost', href:'play.html?game=' + encodeURIComponent(c.id), target:'_blank', rel:'noopener', text:'Try it'});
+  return el('article', {class:'card'}, [
+    el('h2', {text:c.title}),
+    el('div', {class:'meta'}, [el('span', {class:'tag', text:c.levels + ' levels, no timer'}), el('span', {class:'tag draft', text:c.status + ', not yet tried with learners'})]),
+    el('p', {text:c.idea}),
+    el('div', {class:'row'}, [cp, open]),
+    el('div', {class:'link', text:link(c.id)})
+  ]);
+}
+function topicBlock(cls, sub, topic, items, showPath){
+  items = items.slice().sort(function(a, b){ return (a.order || 0) - (b.order || 0); });
+  var box = el('section', {}, []);
+  box.appendChild(el('h2', {class:'topic-h', text:topic}));
+  box.appendChild(el('p', {class:'count', text:(showPath ? cls + ', ' + sub + '. ' : '') + items.length + (items.length === 1 ? ' game' : ' games') + ' in this topic'}));
+  if (items.length > 1) {
+    var pb = el('button', {class:'btn ghost', type:'button', text:'Copy playlist link (plays them in order)'});
+    pb.addEventListener('click', function(){ copy(link(items[0].id, true), pb, 'Copy playlist link (plays them in order)'); });
+    box.appendChild(el('div', {class:'row'}, [pb]));
+  }
+  var ol = el('ol', {class:'pl'}, []);
+  items.forEach(function(c){ ol.appendChild(el('li', {}, [gameCard(c)])); });
+  box.appendChild(ol);
+  return box;
+}
+function drawList(){
+  var host = $('#list'); host.replaceChildren();
+  if (!CATALOG.length) { host.appendChild(el('div', {class:'empty', text:'No games yet. Ask Claude to build one.'})); return; }
+  var q = state.q.trim().toLowerCase();
+  var pool = q ? CATALOG.filter(function(c){ return [c.title, c.class, c.subject, c.topic, c.idea].join(' ').toLowerCase().indexOf(q) >= 0; })
+               : CATALOG.filter(function(c){ return c.class === state.cls && c.subject === state.sub; });
+  if (!pool.length) { host.appendChild(el('div', {class:'empty', text:'Nothing matches. Clear the search.'})); return; }
+  var keys = uniq(pool.map(function(c){ return c.class + '\u0001' + c.subject + '\u0001' + c.topic; }));
+  keys.forEach(function(k){
+    var p = k.split('\u0001');
+    host.appendChild(topicBlock(p[0], p[1], p[2], pool.filter(function(c){ return c.class === p[0] && c.subject === p[1] && c.topic === p[2]; }), !!q));
+  });
+}
+$('#q').addEventListener('input', function(e){ state.q = e.target.value; drawNav(); drawList(); });
+$('#gbase').value = store('lib.base'); $('#gtag').value = store('lib.tag');
+$('#gbase').addEventListener('input', function(e){ store('lib.base', e.target.value); refreshLinks(); });
+$('#gtag').addEventListener('input', function(e){ store('lib.tag', e.target.value); refreshLinks(); });
+drawNav(); refreshLinks();
+</script>
+</body>
+</html>

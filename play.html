@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Struggle First</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="engine.css">
+</head>
+<body>
+<div class="wrap" id="app"><p class="muted">Loading...</p></div>
+<script src="config.js"></script>
+<script src="catalog.js"></script>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search), id = (q.get('game') || '').replace(/[^A-Za-z0-9-]/g, ''), app = document.getElementById('app');
+  function add(src, ok, bad){ var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = bad; document.body.appendChild(s); }
+  if (id) { window.SF_MANUAL = true; window.SF_GAME = id; }
+  add('engine.js', function(){
+    if (!id) return;
+    add('games/' + id + '.js', function(){ SF.start(); }, function(){ app.textContent = 'This adventure was not found. Ask your teacher for a new link.'; });
+  }, function(){ app.textContent = 'The page could not load. Check your internet and try again.'; });
+})();
+</script>
+</body>
+</html>
