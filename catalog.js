@@ -205,5 +205,29 @@ window.CATALOG = [
   "idea": "Learners find distances from echo times, then the lowest notes of open and closed pipes. It shows whether they remember the sound travels there and back.",
   "levels": 5,
   "status": "Draft"
+ },
+ {
+  "id": "ss2-phys-mast-drop",
+  "file": "ss2-phys-mast-drop.js",
+  "class": "SS2",
+  "subject": "Physics",
+  "topic": "Projectiles and falling bodies",
+  "order": 1,
+  "title": "The Mast Drop",
+  "idea": "Learners find a fall time, compare a heavy and a light tool, and find how far a rolled ball travels. It shows whether they know falling and sideways motion are independent.",
+  "levels": 5,
+  "status": "Draft"
+ },
+ {
+  "id": "ss2-phys-market-trolley",
+  "file": "ss2-phys-market-trolley.js",
+  "class": "SS2",
+  "subject": "Physics",
+  "topic": "Newton's laws and momentum",
+  "order": 2,
+  "title": "The Market Trolley",
+  "idea": "Learners use F = ma and momentum, explain a sudden stop, and compare the forces in a crash. It shows whether they think a bigger object pushes harder.",
+  "levels": 5,
+  "status": "Draft"
  }
 ];
